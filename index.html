@@ -4,13 +4,10 @@
   <meta charset="UTF-8" />
   <title>Hi 💖</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: "Comic Sans MS", "Segoe UI", sans-serif;
-    }
+    * { box-sizing: border-box; font-family: "Comic Sans MS", "Segoe UI", sans-serif; }
+    html,body { height: 100%; margin: 0; }
 
     body {
-      margin: 0;
       height: 100vh;
       background: linear-gradient(135deg, #ffd6e8, #ffeef6);
       overflow: hidden;
@@ -24,16 +21,230 @@
       padding: 2.5rem;
       border-radius: 20px;
       text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
       position: relative;
       z-index: 2;
-      max-width: 320px;
+      max-width: 360px;
+      transform-origin: center;
     }
 
-    h1 {
-      margin-top: 0;
-      color: #ff4d88;
+    h1 { margin-top: 0; color: #ff4d88; letter-spacing: -0.5px; }
+    p { margin-bottom: 1.6rem; color: #6b2840; }
+
+    /* Button */
+    .val-btn {
+      background: linear-gradient(180deg, #ff6ea3, #ff3d7a);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.2rem;
+      font-size: 1.05rem;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(255,77,136,0.28);
+      transition: transform 150ms ease, box-shadow 150ms ease;
+      user-select: none;
     }
+
+    .val-btn:active { transform: translateY(2px) scale(0.995); }
+    .val-btn:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(255,77,136,0.28); }
+    .val-btn:focus { outline: 3px solid rgba(255,77,136,0.18); }
+
+    /* Floating hearts */
+    .heart {
+      position: absolute;
+      bottom: -20px;
+      font-size: 20px;
+      animation: floatUp 6s linear infinite;
+      opacity: 0.8;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(-110vh) scale(1.6); opacity: 0; }
+    }
+
+    /* make sure canvas covers the screen and doesn't block pointer events */
+    canvas#confetti {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999; /* above everything for visible confetti */
+    }
+
+    /* small responsive tweaks */
+    @media (max-width: 420px) {
+      .card { padding: 1.8rem; max-width: 320px; }
+      .val-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="card" role="region" aria-label="Valentine card">
+    <h1>Hi cutie 💕</h1>
+    <p>This little page is just for you.</p>
+
+    <!-- Button requested by user: text exactly "click me" -->
+    <button id="valBtn" class="val-btn" aria-pressed="false" aria-label="Click me for confetti">click me</button>
+  </div>
+
+  <script>
+    /* Floating hearts (keeps your original idea but a little tuned) */
+    const hearts = ["💖","💗","💘","💝","💞"];
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerText = hearts[Math.floor(Math.random()*hearts.length)];
+      heart.style.left = Math.random()*100 + 'vw';
+      heart.style.fontSize = 14 + Math.random()*28 + 'px';
+      heart.style.animationDuration = 3.5 + Math.random()*4 + 's';
+      heart.style.opacity = 0.9 - Math.random()*0.4;
+      document.body.appendChild(heart);
+      setTimeout(()=> heart.remove(), 8500);
+    }
+    setInterval(createHeart, 400);
+
+    /* Confetti implementation (lightweight, dependency-free)
+       - creates a full-screen canvas that draws rectangular confetti particles
+       - spawns bursts at the clicked button position
+    */
+    (function(){
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      let W = 0, H = 0, DPR = Math.max(1, window.devicePixelRatio || 1);
+
+      function resize() {
+        DPR = Math.max(1, window.devicePixelRatio || 1);
+        W = Math.ceil(window.innerWidth);
+        H = Math.ceil(window.innerHeight);
+        canvas.width = W * DPR;
+        canvas.height = H * DPR;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Valentine-ish colors for confetti
+      const COLORS = ["#ff5d8f", "#ff9ccf", "#ff3d7a", "#ffb6d5", "#ffd2ea", "#ff7aa9"];
+
+      // particle pool
+      let particles = [];
+
+      function rand(min, max) { return Math.random()*(max-min)+min; }
+
+      function spawnConfetti(x, y, count = 90) {
+        const spread = Math.PI * 1.8; // how wide the burst is
+        for (let i=0; i<count; i++) {
+          const angle = (Math.PI / 2) + (rand(-spread/2, spread/2)); // upward-ish +/- spread
+          const speed = rand(3, 12);
+          const size = rand(6, 14);
+          particles.push({
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * speed * rand(0.6, 1.1),
+            vy: Math.sin(angle) * speed * rand(0.6, 1.1),
+            size: size,
+            wobble: rand(0, 2*Math.PI),
+            wobbleSpeed: rand(0.05, 0.18),
+            rotation: rand(0, 2*Math.PI),
+            rotationSpeed: rand(-0.2, 0.2),
+            color: COLORS[Math.floor(Math.random()*COLORS.length)],
+            ttl: Math.floor(rand(70, 120)), // frames to live
+            decay: rand(0.004, 0.01)
+          });
+        }
+        // start the animation loop if not already running
+        if (!animationRunning) {
+          animationRunning = true;
+          requestAnimationFrame(loop);
+        }
+      }
+
+      // spawn confetti at center of the target element (button)
+      const btn = document.getElementById('valBtn');
+      btn.addEventListener('click', (e) => {
+        // button accessibility state
+        const pressed = btn.getAttribute('aria-pressed') === 'true';
+        btn.setAttribute('aria-pressed', String(!pressed));
+
+        // compute the center position of the button for confetti origin
+        const r = btn.getBoundingClientRect();
+        const originX = r.left + r.width/2;
+        const originY = r.top + r.height/2;
+
+        spawnConfetti(originX, originY, 110);
+        // small pulse animation on card for feedback
+        pulseCard();
+      });
+
+      // small visual feedback when clicked
+      function pulseCard() {
+        const card = document.querySelector('.card');
+        card.animate([
+          { transform: 'scale(1)' },
+          { transform: 'scale(1.03)' },
+          { transform: 'scale(1)' }
+        ], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      }
+
+      // animation loop
+      let animationRunning = false;
+      function loop() {
+        ctx.clearRect(0,0,W,H);
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+
+          // physics
+          p.vy += 0.35 * (p.size/10); // gravity slightly scales with size for a playful fall
+          p.vx *= 0.995; // air resistance
+          p.vy *= 0.998;
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // wobble and rotation
+          p.wobble += p.wobbleSpeed;
+          p.rotation += p.rotationSpeed;
+
+          // draw confetti as rotated rectangles
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation + Math.sin(p.wobble) * 0.2);
+          ctx.globalAlpha = Math.max(0, Math.min(1, p.ttl / 120));
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+          ctx.restore();
+
+          // TTL & remove
+          p.ttl -= 1;
+          if (p.y > H + 50 || p.x < -50 || p.x > W + 50 || p.ttl <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+
+        if (particles.length > 0) {
+          requestAnimationFrame(loop);
+        } else {
+          animationRunning = false;
+        }
+      }
+
+      // allow clicking anywhere on page for confetti ()
+      document.body.addEventListener('click', (e) => spawnConfetti(e.clientX, e.clientY, 70));
+
+    })();
+  </script>
+</body>
+</html>
 
     button {
       margin-top: 1rem;
