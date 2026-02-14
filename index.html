@@ -36,20 +36,27 @@
     }
 
     button {
-      margin-top: 20px;
-      padding: 12px 22px;
+      margin-top: 1rem;
+      padding: 12px 20px;
       border: none;
-      border-radius: 999px;
+      border-radius: 12px;
       background: #ff4d88;
       color: white;
       font-size: 16px;
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: 0.2s;
     }
 
     button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      transform: scale(1.08);
+      background: #ff2f75;
+    }
+
+    #message {
+      margin-top: 1rem;
+      color: #ff4d88;
+      font-weight: bold;
+      display: none;
     }
 
     /* Floating hearts */
@@ -66,40 +73,32 @@
         transform: translateY(0) scale(1);
         opacity: 0;
       }
-      10% { opacity: 1; }
+      10% {
+        opacity: 1;
+      }
       100% {
         transform: translateY(-110vh) scale(1.6);
         opacity: 0;
       }
     }
-
-    /* Confetti */
-    .confetti {
-      position: fixed;
-      width: 10px;
-      height: 10px;
-      top: 0;
-      z-index: 999;
-      animation: fall linear forwards;
-    }
-
-    @keyframes fall {
-      to {
-        transform: translateY(110vh) rotate(720deg);
-        opacity: 0;
-      }
-    }
   </style>
 </head>
+
 <body>
 
   <div class="card">
     <h1>Hi cutie 💕</h1>
     <p>This little page is just for you.</p>
-    <button onclick="launchConfetti()">Click me 💘</button>
+
+    <button onclick="showLove()">Click me 💘</button>
+    <div id="message">Happy Valentine’s Day cutie 💖</div>
   </div>
 
   <script>
+    function showLove() {
+      document.getElementById("message").style.display = "block";
+    }
+
     // Floating hearts
     const hearts = ["💖", "💗", "💘", "💝", "💞"];
 
@@ -111,24 +110,11 @@
       heart.style.animationDuration = 4 + Math.random() * 4 + "s";
       heart.style.fontSize = 16 + Math.random() * 24 + "px";
       document.body.appendChild(heart);
+
       setTimeout(() => heart.remove(), 8000);
     }
 
     setInterval(createHeart, 400);
-
-    // Confetti
-    function launchConfetti() {
-      for (let i = 0; i < 120; i++) {
-        const conf = document.createElement("div");
-        conf.className = "confetti";
-        conf.style.left = Math.random() * 100 + "vw";
-        conf.style.background = `hsl(${Math.random()*360}, 80%, 60%)`;
-        conf.style.animationDuration = 2 + Math.random() * 3 + "s";
-        conf.style.transform = `translateY(-20px)`;
-        document.body.appendChild(conf);
-        setTimeout(() => conf.remove(), 5000);
-      }
-    }
   </script>
 
 </body>
