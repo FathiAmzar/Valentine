@@ -3,55 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hi 💖</title>
+  <title>His 💖</title>
   <style>
     * {
       box-sizing: border-box;
-      font-family: "Comic Sans MS", "Segoe UI", sans-serif;
+      font-family: "Comic Sans MS", "Segoe UI", system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       background: linear-gradient(135deg, #ffd6e8, #ffeef6);
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 18px;
     }
 
     .card {
-      background: white;
-      padding: 2.5rem;
-      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 2.2rem 1.6rem;
+      border-radius: 22px;
       text-align: center;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
       position: relative;
       z-index: 2;
-      max-width: 320px;
-      width: calc(100% - 40px);
-      user-select: none;
+      width: min(92vw, 360px);
     }
 
     h1 {
-      margin-top: 0;
+      margin: 0 0 0.5rem;
       color: #ff4d88;
+      font-size: clamp(26px, 6vw, 34px);
+      line-height: 1.1;
+    }
+
+    p {
+      margin: 0.25rem 0 0;
+      color: #ff4d88;
+      opacity: 0.9;
+      font-size: clamp(14px, 3.8vw, 16px);
     }
 
     button {
-      margin-top: 1rem;
-      padding: 12px 20px;
+      margin-top: 1.1rem;
+      padding: 14px 18px;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       background: #ff4d88;
       color: white;
       font-size: 16px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+      width: 100%;
+      max-width: 260px;
+      touch-action: manipulation;
+      box-shadow: 0 10px 20px rgba(255, 77, 136, 0.25);
+    }
+
+    button:active {
+      transform: scale(0.98);
     }
 
     button:hover {
-      transform: scale(1.08);
+      transform: scale(1.04);
       background: #ff2f75;
     }
 
@@ -60,105 +79,87 @@
       color: #ff4d88;
       font-weight: bold;
       display: none;
+      font-size: clamp(15px, 4vw, 17px);
     }
 
-    /* Floating hearts (background) */
+    /* Floating hearts */
     .heart {
       position: absolute;
-      bottom: -20px;
+      bottom: -24px;
       font-size: 20px;
       animation: floatUp 6s linear infinite;
-      opacity: 0.8;
+      opacity: 0.85;
       pointer-events: none;
-      z-index: 0;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+      user-select: none;
+      filter: drop-shadow(0 8px 10px rgba(255, 77, 136, 0.15));
     }
 
     @keyframes floatUp {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 0;
-      }
-      10% { opacity: 1; }
-      100% {
-        transform: translateY(-110vh) scale(1.6);
-        opacity: 0;
-      }
+      0%   { transform: translateY(0) scale(1); opacity: 0; }
+      10%  { opacity: 1; }
+      100% { transform: translateY(-110vh) scale(1.6); opacity: 0; }
     }
 
     /* Confetti pieces */
     .confetti {
       position: fixed;
-      width: 10px;
+      top: -10px;
+      width: 9px;
       height: 14px;
-      top: -20px;
-      left: 0;
-      border-radius: 3px;
-      pointer-events: none;
-      z-index: 3;
       opacity: 0.95;
-      transform: translate(-50%, -50%) rotate(0deg);
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 5;
+      will-change: transform;
       animation: confettiFall linear forwards;
-      will-change: transform, opacity;
+      transform: translate3d(0,0,0) rotate(0deg);
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.06));
     }
 
     @keyframes confettiFall {
       0% {
-        transform: translate(var(--x), -20px) rotate(0deg);
+        transform: translate3d(0, -20px, 0) rotate(0deg);
         opacity: 1;
       }
       100% {
-        transform: translate(calc(var(--x) + var(--drift)), calc(100vh + 40px)) rotate(var(--rot));
-        opacity: 0.9;
+        transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin));
+        opacity: 0.95;
       }
     }
 
-    /* Heart explosion particles (emoji) */
-    .burst-heart {
+    /* Exploding hearts */
+    .boom-heart {
       position: fixed;
       left: 0;
       top: 0;
-      font-size: 18px;
+      transform: translate3d(-50%, -50%, 0);
       pointer-events: none;
-      z-index: 4;
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-      animation: burst 900ms ease-out forwards;
+      z-index: 6;
+      user-select: none;
       will-change: transform, opacity;
-      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));
+      animation: boom 900ms ease-out forwards;
+      filter: drop-shadow(0 10px 12px rgba(255, 77, 136, 0.18));
     }
 
-    @keyframes burst {
-      0% { transform: translate(var(--sx), var(--sy)) scale(0.8); opacity: 1; }
-      80% { opacity: 1; }
-      100% { transform: translate(var(--tx), var(--ty)) scale(1.35); opacity: 0; }
+    @keyframes boom {
+      0%   { transform: translate3d(calc(var(--x) * 0px), calc(var(--y) * 0px), 0) scale(0.6); opacity: 0; }
+      10%  { opacity: 1; }
+      100% { transform: translate3d(var(--x), var(--y), 0) scale(1.4); opacity: 0; }
     }
 
-    /* Cute click ripple */
-    .ripple {
-      position: fixed;
-      width: 16px;
-      height: 16px;
-      border-radius: 999px;
-      border: 2px solid rgba(255, 77, 136, 0.55);
-      pointer-events: none;
-      z-index: 4;
-      transform: translate(-50%, -50%) scale(0.6);
-      animation: ripple 550ms ease-out forwards;
-    }
-
-    @keyframes ripple {
-      to {
-        transform: translate(-50%, -50%) scale(6);
-        opacity: 0;
-      }
+    /* Reduce motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .heart { animation: none; opacity: 0.4; }
+      .confetti { animation: none; display: none; }
+      .boom-heart { animation: none; display: none; }
+      button { transition: none; }
     }
   </style>
 </head>
 
 <body>
   <div class="card">
-    <h1>Hi cutie 💕</h1>
+    <h1>His cutie 💕</h1>
     <p>This little page is just for you.</p>
 
     <button id="loveBtn" type="button">Click me 💘</button>
@@ -166,126 +167,109 @@
   </div>
 
   <script>
-    // ---- Existing: show message + floating hearts background ----
-    function showLove() {
-      document.getElementById("message").style.display = "block";
-    }
+    // Button click: show message + confetti + heart explosion
+    const loveBtn = document.getElementById("loveBtn");
+    const messageEl = document.getElementById("message");
 
+    loveBtn.addEventListener("click", (e) => {
+      messageEl.style.display = "block";
+
+      const { clientX: x, clientY: y } = e;
+      burstConfetti(x, y);
+      explodeHearts(x, y);
+    }, { passive: true });
+
+    // Touch support (older mobile browsers sometimes don't fire click reliably)
+    loveBtn.addEventListener("touchstart", (e) => {
+      const t = e.changedTouches && e.changedTouches[0];
+      if (!t) return;
+      messageEl.style.display = "block";
+      burstConfetti(t.clientX, t.clientY);
+      explodeHearts(t.clientX, t.clientY);
+    }, { passive: true });
+
+    // Floating hearts background
     const hearts = ["💖", "💗", "💘", "💝", "💞"];
+
     function createHeart() {
       const heart = document.createElement("div");
       heart.className = "heart";
       heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
       heart.style.left = Math.random() * 100 + "vw";
-      heart.style.animationDuration = 4 + Math.random() * 4 + "s";
-      heart.style.fontSize = 16 + Math.random() * 24 + "px";
+      heart.style.animationDuration = (4 + Math.random() * 4) + "s";
+      heart.style.fontSize = (16 + Math.random() * 24) + "px";
       document.body.appendChild(heart);
       setTimeout(() => heart.remove(), 8000);
     }
-    setInterval(createHeart, 400);
+    setInterval(createHeart, 420);
 
-    // ---- NEW: Confetti + Heart explosion on click ----
-    const confettiColors = ["#ff4d88", "#ffcc00", "#7c5cff", "#22c55e", "#38bdf8", "#fb7185", "#f472b6"];
-    const burstEmojis = ["💖", "💗", "💘", "💝", "💞", "✨", "🌸"];
+    // Confetti burst
+    const confettiColors = ["#ff4d88", "#ffd1e3", "#ffb3d1", "#ff7fb0", "#ffeef6", "#ff2f75"];
 
-    function rand(min, max) { return Math.random() * (max - min) + min; }
-    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-    function spawnRipple(x, y) {
-      const r = document.createElement("div");
-      r.className = "ripple";
-      r.style.left = x + "px";
-      r.style.top = y + "px";
-      document.body.appendChild(r);
-      r.addEventListener("animationend", () => r.remove());
-    }
-
-    function spawnConfetti(x, y, count = 80) {
+    function burstConfetti(x, y) {
+      const count = 90; // burst size
       for (let i = 0; i < count; i++) {
-        const c = document.createElement("div");
-        c.className = "confetti";
-        const sizeW = rand(6, 12);
-        const sizeH = rand(8, 16);
-        c.style.width = sizeW + "px";
-        c.style.height = sizeH + "px";
-        c.style.background = pick(confettiColors);
+        const piece = document.createElement("div");
+        piece.className = "confetti";
 
-        // Start near click, but confetti "falls" from slightly above
-        c.style.left = x + rand(-20, 20) + "px";
-        c.style.top = (y + rand(-20, 20)) + "px";
+        // start near click point
+        const startX = x + rand(-20, 20);
+        const startY = y + rand(-10, 10);
+        piece.style.left = startX + "px";
+        piece.style.top = startY + "px";
 
-        const duration = rand(1200, 2200); // ms
-        const drift = rand(-140, 140) + "px";
-        const rot = rand(180, 1080) + "deg";
+        // random size + color
+        const w = rand(6, 10);
+        const h = rand(10, 16);
+        piece.style.width = w + "px";
+        piece.style.height = h + "px";
+        piece.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
 
-        // Use CSS variables for animation targets
-        c.style.setProperty("--x", (x + rand(-40, 40)) + "px");
-        c.style.setProperty("--drift", drift);
-        c.style.setProperty("--rot", rot);
-        c.style.animationDuration = duration + "ms";
+        // animation randomness
+        const duration = rand(900, 1500);
+        piece.style.animationDuration = duration + "ms";
+        piece.style.setProperty("--drift", rand(-120, 120) + "px");
+        piece.style.setProperty("--spin", rand(360, 1080) + "deg");
 
-        // Random rotation at start
-        c.style.transform = `translate(-50%, -50%) rotate(${rand(0, 360)}deg)`;
+        // little rotation at start
+        piece.style.transform = "rotate(" + rand(0, 180) + "deg)";
 
-        document.body.appendChild(c);
-        setTimeout(() => c.remove(), duration + 200);
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), duration + 50);
       }
     }
 
-    function spawnHeartBurst(x, y, count = 18) {
+    // Heart explosion
+    const boomHearts = ["💖", "💘", "💝", "💗", "💞", "❤️"];
+
+    function explodeHearts(x, y) {
+      const count = 16;
       for (let i = 0; i < count; i++) {
-        const p = document.createElement("div");
-        p.className = "burst-heart";
-        p.textContent = pick(burstEmojis);
+        const h = document.createElement("div");
+        h.className = "boom-heart";
+        h.textContent = boomHearts[Math.floor(Math.random() * boomHearts.length)];
 
-        // Start position
-        p.style.left = x + "px";
-        p.style.top = y + "px";
+        h.style.left = x + "px";
+        h.style.top = y + "px";
 
-        const angle = rand(0, Math.PI * 2);
-        const radius = rand(60, 180);
+        // scatter vectors
+        const angle = (Math.PI * 2) * (i / count) + rand(-0.25, 0.25);
+        const radius = rand(60, 140);
+        const dx = Math.cos(angle) * radius;
+        const dy = Math.sin(angle) * radius;
 
-        // Start coords (sx/sy) and target coords (tx/ty) for animation
-        const sx = x + rand(-6, 6);
-        const sy = y + rand(-6, 6);
-        const tx = x + Math.cos(angle) * radius;
-        const ty = y + Math.sin(angle) * radius;
+        h.style.setProperty("--x", dx + "px");
+        h.style.setProperty("--y", dy + "px");
+        h.style.fontSize = rand(16, 28) + "px";
 
-        p.style.setProperty("--sx", (sx - x) + "px");
-        p.style.setProperty("--sy", (sy - y) + "px");
-        p.style.setProperty("--tx", (tx - x) + "px");
-        p.style.setProperty("--ty", (ty - y) + "px");
-
-        p.style.fontSize = rand(14, 28) + "px";
-
-        document.body.appendChild(p);
-        p.addEventListener("animationend", () => p.remove());
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 950);
       }
     }
 
-    function boomAt(x, y) {
-      spawnRipple(x, y);
-      spawnHeartBurst(x, y, 20);
-      spawnConfetti(x, y, 90);
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
     }
-
-    // Button click
-    const loveBtn = document.getElementById("loveBtn");
-    loveBtn.addEventListener("click", (e) => {
-      showLove();
-      const rect = loveBtn.getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
-      boomAt(x, y);
-    });
-
-    // Optional: click anywhere on page to explode hearts + confetti
-    // (Remove this if you only want the button.)
-    document.addEventListener("click", (e) => {
-      // avoid double-trigger when clicking the button (already handled)
-      if (e.target === loveBtn) return;
-      boomAt(e.clientX, e.clientY);
-    }, { passive: true });
   </script>
 </body>
 </html>
